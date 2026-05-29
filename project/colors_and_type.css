@@ -1,0 +1,183 @@
+/* ============================================================
+   HOFT MERCHANDISING — Colors & Type tokens
+   A field tool for merchandisers servicing HOFT fence / post /
+   planter displays inside RONA and Home Depot stores.
+   Utilitarian, high-contrast, glanceable on a phone in-aisle.
+   ============================================================ */
+
+/* ---- Webfonts ----------------------------------------------
+   Larsseit          -> all UI, body & numerals. Brand family,
+                        self-hosted from fonts/ (geometric sans).
+   Queens Compressed -> the compressed-italic folder labels.
+                        Brand file, self-hosted from fonts/.
+   Lora (CDN)        -> the serif-italic "merchandising" accent
+                        (not supplied as a file — CDN is fine).
+   The HOFT wordmark ships as a PNG asset; Larsseit ExtraBold is
+   its nearest live fallback. See README.
+------------------------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital@1&display=swap');
+
+/* ---- Larsseit (brand UI sans) ---- */
+@font-face { font-family:'Larsseit'; src:url('fonts/LarsseitThin.otf') format('opentype');       font-weight:100; font-style:normal; font-display:swap; }
+@font-face { font-family:'Larsseit'; src:url('fonts/LarsseitThinItalic.otf') format('opentype'); font-weight:100; font-style:italic; font-display:swap; }
+@font-face { font-family:'Larsseit'; src:url('fonts/LarsseitLight.otf') format('opentype');      font-weight:300; font-style:normal; font-display:swap; }
+@font-face { font-family:'Larsseit'; src:url('fonts/LarsseitLightItalic.otf') format('opentype');font-weight:300; font-style:italic; font-display:swap; }
+@font-face { font-family:'Larsseit'; src:url('fonts/LarsseitItalic.otf') format('opentype');     font-weight:400; font-style:italic; font-display:swap; }
+@font-face { font-family:'Larsseit'; src:url('fonts/LarsseitMedium.otf') format('opentype');     font-weight:400 500; font-style:normal; font-display:swap; }
+@font-face { font-family:'Larsseit'; src:url('fonts/LarsseitMediumItalic.otf') format('opentype');font-weight:500; font-style:italic; font-display:swap; }
+@font-face { font-family:'Larsseit'; src:url('fonts/LarsseitBold.otf') format('opentype');       font-weight:600 700; font-style:normal; font-display:swap; }
+@font-face { font-family:'Larsseit'; src:url('fonts/LarsseitBoldItalic.otf') format('opentype');  font-weight:600 700; font-style:italic; font-display:swap; }
+@font-face { font-family:'Larsseit'; src:url('fonts/LarsseitExtraBold.otf') format('opentype');   font-weight:800 900; font-style:normal; font-display:swap; }
+@font-face { font-family:'Larsseit'; src:url('fonts/LarsseitExtraBoldItalic.otf') format('opentype'); font-weight:800 900; font-style:italic; font-display:swap; }
+
+/* ---- Queens Compressed (folder labels) ---- */
+@font-face {
+  font-family: 'Queens Compressed';
+  src: url('fonts/QueensCompressedTrial-MediumItalic.ttf') format('truetype');
+  font-weight: 300 900;   /* single Medium-Italic file used across the range — no faux bold */
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  /* ---------- TYPE FAMILIES ---------- */
+  --font-ui:      'Larsseit', 'Helvetica Neue', Arial, sans-serif;
+  --font-label:   'Queens Compressed', 'Larsseit', 'Helvetica Neue', Arial, serif; /* compressed-italic folder labels */
+  --font-serif:   'Lora', Georgia, 'Times New Roman', serif;       /* "merchandising" accent */
+  --font-num:     'Larsseit', 'Helvetica Neue', Arial, sans-serif;  /* tabular figures */
+
+  /* ---------- BRAND NEUTRALS ---------- */
+  --ink:          #141414;   /* primary text / wordmark */
+  --ink-2:        #4a4a4a;   /* secondary text */
+  --ink-3:        #7d7d7d;   /* tertiary / captions */
+  --paper:        #ffffff;   /* screen background */
+  --paper-2:      #f4f4f4;   /* subtle fills */
+  --hairline:     #e3e3e3;   /* dividers */
+
+  /* ---------- FOLDER GRAY STACK ----------
+     The accordion folders read as a stack of physical tabs.
+     The active tab is the lightest; collapsed tabs step darker
+     as they sink toward the bottom of the screen. */
+  --folder-1:     #e4e4e4;   /* active / top */
+  --folder-2:     #d2d2d2;
+  --folder-3:     #bcbcbc;
+  --folder-4:     #a6a6a6;
+  --folder-5:     #8f8f8f;   /* deepest collapsed */
+  --folder-text:  #1b1b1b;
+  --folder-text-dim: #6f6f6f;
+
+  /* ---------- STATUS ACCENTS ---------- */
+  --alert:        #ED1C24;   /* WHY! / red flag / out of stock */
+  --alert-ink:    #ffffff;
+  --success:      #2FA84F;   /* CONGRATS! / on-target */
+  --success-ink:  #ffffff;
+  --warn:         #F5A623;   /* attention */
+
+  /* ---------- CONDITION HEATMAP ----------
+     Used for the arrival-photo / condition dots: a brown→amber
+     ramp reading like a fill/health gauge. */
+  --heat-1:       #6B3A2A;   /* deep brown  (worst / empty) */
+  --heat-2:       #B5531F;
+  --heat-3:       #E8731C;
+  --heat-4:       #F2901C;
+  --heat-5:       #F6B41C;
+  --heat-6:       #F7C915;   /* amber       (best / full) */
+
+  /* ---------- TYPE SCALE ---------- */
+  --fs-wordmark:  28px;  /* header HOFT */
+  --fs-folder:    24px;  /* folder label */
+  --fs-h1:        22px;
+  --fs-h2:        17px;
+  --fs-body:      15px;
+  --fs-small:     13px;
+  --fs-micro:     11px;
+
+  /* ---------- SPACING (8pt-ish, tightened for mobile) ---------- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-7: 48px;
+
+  /* ---------- RADII ---------- */
+  --r-sm:   8px;
+  --r-md:   14px;   /* folders, content cards */
+  --r-lg:   20px;
+  --r-pill: 999px;  /* YES toggles, action buttons */
+
+  /* ---------- ELEVATION ---------- */
+  --shadow-folder: 0 -1px 0 rgba(255,255,255,.5) inset, 0 2px 6px rgba(0,0,0,.12);
+  --shadow-card:   0 1px 3px rgba(0,0,0,.10);
+  --shadow-pop:    0 8px 28px rgba(0,0,0,.22);
+
+  /* ---------- MOTION ----------
+     Folders open/close with a firm, slightly springy ease.
+     No flashy effects — it should feel like sliding a drawer. */
+  --ease-drawer: cubic-bezier(.22,.61,.36,1);
+  --dur-fast:   140ms;
+  --dur-mid:    260ms;
+  --dur-slow:   420ms;
+}
+
+/* ============================================================
+   SEMANTIC TYPE
+   ============================================================ */
+.hoft-wordmark {
+  font-family: var(--font-ui);
+  font-weight: 900;
+  letter-spacing: -.02em;
+  color: var(--ink);
+  text-transform: uppercase;
+}
+.hoft-serif-accent {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--ink);
+}
+.folder-label {
+  font-family: var(--font-label);
+  font-weight: 800;
+  font-style: italic;
+  font-size: var(--fs-folder);
+  letter-spacing: -.01em;
+  color: var(--folder-text);
+}
+h1, .h1 {
+  font-family: var(--font-ui);
+  font-weight: 800;
+  font-size: var(--fs-h1);
+  letter-spacing: -.01em;
+  color: var(--ink);
+  margin: 0;
+}
+h2, .h2 {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: var(--fs-h2);
+  letter-spacing: .01em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin: 0;
+}
+p, .body {
+  font-family: var(--font-ui);
+  font-weight: 400;
+  font-size: var(--fs-body);
+  line-height: 1.45;
+  color: var(--ink-2);
+  margin: 0;
+}
+.caption {
+  font-family: var(--font-ui);
+  font-size: var(--fs-small);
+  color: var(--ink-3);
+}
+.num {
+  font-family: var(--font-num);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}

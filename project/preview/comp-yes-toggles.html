@@ -1,0 +1,21 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--paper);font-family:var(--font-ui);color:var(--ink)}
+  .wrap{padding:22px 24px}
+  .row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  .lbl{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);margin-top:14px}
+  
+.q{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:13px 16px;border-radius:12px;background:var(--paper-2);margin-bottom:10px;max-width:520px}
+.qt{font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.01em}
+.tog{border:none;border-radius:999px;padding:9px 22px;font-weight:800;font-size:13px;letter-spacing:.05em;cursor:pointer}
+.on{background:var(--ink);color:#fff}
+.off{background:var(--folder-2);color:#3a3a3a}
+
+</style></head><body><div class="wrap">
+<div class="q"><span class="qt">Any out of stock?</span><button class="tog on">YES</button></div>
+<div class="q"><span class="qt">Is the POP displayed correctly?</span><button class="tog off">YES</button></div>
+<div class="q"><span class="qt">Competitor presence!</span><button class="tog off">YES</button></div>
+<div class="lbl">Checklist rows — gray pill toggles, ink fill when affirmed</div></div></body></html>

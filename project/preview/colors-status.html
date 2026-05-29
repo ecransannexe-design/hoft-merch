@@ -1,0 +1,21 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--paper);font-family:var(--font-ui);color:var(--ink)}
+  .wrap{padding:22px 24px}
+  .row{display:flex;gap:14px;flex-wrap:wrap}
+  .lbl{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);margin-top:6px}
+  .mono{font-variant-numeric:tabular-nums}
+  
+.sw{flex:1;min-width:150px}
+.chip{height:84px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:800;font-style:italic;color:#fff;font-size:18px;letter-spacing:.02em}
+.name{font-size:12px;font-weight:700;margin-top:8px}
+.hex{font-size:11px;color:var(--ink-3)}
+
+</style></head><body><div class="wrap"><div class="row">
+<div class="sw"><div class="chip" style="background:var(--alert)">WHY!</div><div class="name">Alert / Red flag</div><div class="hex mono">#ED1C24</div></div>
+<div class="sw"><div class="chip" style="background:var(--success)">CONGRATS!</div><div class="name">Success / On target</div><div class="hex mono">#2FA84F</div></div>
+<div class="sw"><div class="chip" style="background:var(--warn);color:#3a2a00">ATTN</div><div class="name">Warn</div><div class="hex mono">#F5A623</div></div>
+</div></div></body></html>
