@@ -1,0 +1,52 @@
+/* ============================================================
+   HOFT MERCHANDISING — design tokens
+   ============================================================ */
+
+:root {
+  /* --- type families --- */
+  --font-ui:    'Larsseit', 'Helvetica Neue', Arial, sans-serif;
+  --font-label: 'Queens Compressed', 'Larsseit', 'Helvetica Neue', Arial, serif;
+  --font-num:   'Larsseit', 'Helvetica Neue', Arial, sans-serif;
+
+  /* --- neutrals --- */
+  --ink:      #141414;
+  --ink-2:    #4a4a4a;
+  --ink-3:    #7d7d7d;
+  --paper:    #ffffff;
+  --paper-2:  #f4f4f4;
+  --hairline: #e3e3e3;
+
+  /* --- folder gray stack --- */
+  --folder-1: #e4e4e4;
+  --folder-2: #d2d2d2;
+  --folder-3: #bcbcbc;
+  --folder-4: #a6a6a6;
+  --folder-5: #8f8f8f;
+
+  /* --- status accents --- */
+  --alert:   #ED1C24;
+  --success: #2FA84F;
+  --warn:    #F5A623;
+
+  /* --- radii --- */
+  --r-sm:   8px;
+  --r-md:   14px;
+  --r-pill: 999px;
+
+  /* --- shadows --- */
+  --shadow-card:   0 1px 3px rgba(0, 0, 0, 0.10);
+  --shadow-folder: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-pop:    0 8px 28px rgba(0, 0, 0, 0.22);
+
+  /* --- motion --- */
+  --ease-drawer: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur-fast:    140ms;
+  --dur-mid:     260ms;
+  --dur-slow:    420ms;
+
+  /* --- safe areas (iOS Dynamic Island / Android cutouts) --- */
+  --safe-top:    env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left:   env(safe-area-inset-left, 0px);
+  --safe-right:  env(safe-area-inset-right, 0px);
+}

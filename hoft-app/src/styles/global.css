@@ -1,0 +1,46 @@
+/* Global resets and mobile-first base */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--font-ui);
+  background: #4a4a4a;
+  /* Prevent text size adjustment on iOS rotation */
+  -webkit-text-size-adjust: 100%;
+}
+
+#root {
+  height: 100%;
+}
+
+/* Full-screen app shell used by both screens */
+.screen {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* Momentum scroll for any scrollable container */
+.scroll-y {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Remove default button styling */
+button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* Prevent image drag on mobile */
+img {
+  -webkit-user-drag: none;
+  user-select: none;
+}

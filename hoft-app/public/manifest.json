@@ -1,0 +1,13 @@
+{
+  "name": "HOFT Merchandising",
+  "short_name": "HOFT",
+  "description": "Field tool for HOFT merchandisers visiting RONA and Home Depot stores",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#4a4a4a",
+  "theme_color": "#4a4a4a",
+  "icons": [
+    { "src": "/assets/hoft-logo.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
