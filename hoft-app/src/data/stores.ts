@@ -1,4 +1,4 @@
-import type { Store, ChecklistItem, Banner } from '../types'
+import type { Store, Banner } from '../types'
 
 export const REPS: string[] = [
   'Marc Tremblay',
@@ -29,12 +29,6 @@ export const BANNER_LABEL: Record<Banner, string> = {
   RONA: 'RONA',
   'RONA+': 'RONA+',
 }
-
-export const CHECKLIST: ChecklistItem[] = [
-  { id: 'oos',  q: 'Any out of stock?' },
-  { id: 'pop',  q: 'Is the POP displayed correctly?' },
-  { id: 'comp', q: 'Competitor presence!' },
-]
 
 export const PRODUCTS: string[] = [
   'POTEAU LIGNE KIT C AL.3X72"NR',   'POTEAU FIN KIT A AL.3X72"NR',   'POTEAU COIN KIT B AL.3X72"NR',

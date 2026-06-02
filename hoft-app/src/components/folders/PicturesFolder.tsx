@@ -1,83 +1,34 @@
 import React from 'react'
-import { promptCapture } from '../../lib/camera'
+import { PhotoCapture } from '../PhotoCapture'
+import type { PhotoType } from '../../types'
 
 interface Props {
-  pics: string[]
-  setPics: React.Dispatch<React.SetStateAction<string[]>>
+  photos: Partial<Record<PhotoType, string>>
+  onPhoto: (type: PhotoType, url: string) => void
 }
 
-export function PicturesFolder({ pics, setPics }: Props) {
-  const addPhoto = async () => {
-    const result = await promptCapture()
-    if (result) setPics(prev => [...prev, result])
-  }
+export function PicturesFolder({ photos, onPhoto }: Props) {
+  const done = (['competitor', 'final'] as PhotoType[]).filter(t => !!photos[t]).length
 
   return (
     <div>
-      <p
-        style={{
-          fontFamily: 'var(--font-ui)',
-          fontSize: 14,
-          fontWeight: 600,
-          color: '#1b1b1b',
-          margin: '0 0 14px',
-        }}
-      >
-        After photos — show the finished display.
+      <p style={{ fontFamily: 'var(--font-ui)', fontSize: 14, fontWeight: 600, color: '#1b1b1b', margin: '0 0 14px' }}>
+        After &amp; competitor photos.
       </p>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }}>
-        {pics.map((url, i) => (
-          <div
-            key={i}
-            style={{
-              width: '100%',
-              aspectRatio: '1',
-              borderRadius: 8,
-              overflow: 'hidden',
-              background: '#000',
-            }}
-          >
-            <img
-              src={url}
-              alt={`after ${i + 1}`}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-          </div>
-        ))}
+      <PhotoCapture
+        label="Competitor"
+        photo={photos.competitor ?? null}
+        onSave={url => onPhoto('competitor', url)}
+      />
+      <PhotoCapture
+        label="Final display"
+        photo={photos.final ?? null}
+        onSave={url => onPhoto('final', url)}
+      />
 
-        {/* add tile */}
-        <div
-          onClick={addPhoto}
-          style={{
-            width: '100%',
-            aspectRatio: '1',
-            borderRadius: 8,
-            cursor: 'pointer',
-            background: '#f4f4f4',
-            border: '1.5px dashed #bcbcbc',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#7d7d7d',
-            fontSize: 28,
-            WebkitTapHighlightColor: 'transparent',
-          }}
-        >
-          +
-        </div>
-      </div>
-
-      <div
-        style={{
-          marginTop: 12,
-          fontFamily: 'var(--font-ui)',
-          fontSize: 12,
-          color: '#7d7d7d',
-          textAlign: 'center',
-        }}
-      >
-        {pics.length} photo{pics.length === 1 ? '' : 's'} added
+      <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12, color: '#7d7d7d', textAlign: 'center', marginTop: 4 }}>
+        {done}/2 photos captured
       </div>
     </div>
   )
