@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="HOFT">
+  <meta name="theme-color" content="#4a4a4a">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/hoft-logo.png">
+  <title>HOFT Merchandising</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Lora:ital@1&display=swap');
+
+    @font-face{font-family:'Larsseit';src:url('fonts/LarsseitThin.otf') format('opentype');font-weight:100;font-style:normal;font-display:swap}
+    @font-face{font-family:'Larsseit';src:url('fonts/LarsseitThinItalic.otf') format('opentype');font-weight:100;font-style:italic;font-display:swap}
+    @font-face{font-family:'Larsseit';src:url('fonts/LarsseitLight.otf') format('opentype');font-weight:300;font-style:normal;font-display:swap}
+    @font-face{font-family:'Larsseit';src:url('fonts/LarsseitLightItalic.otf') format('opentype');font-weight:300;font-style:italic;font-display:swap}
+    @font-face{font-family:'Larsseit';src:url('fonts/LarsseitItalic.otf') format('opentype');font-weight:400;font-style:italic;font-display:swap}
+    @font-face{font-family:'Larsseit';src:url('fonts/LarsseitMedium.otf') format('opentype');font-weight:400 500;font-style:normal;font-display:swap}
+    @font-face{font-family:'Larsseit';src:url('fonts/LarsseitMediumItalic.otf') format('opentype');font-weight:500;font-style:italic;font-display:swap}
+    @font-face{font-family:'Larsseit';src:url('fonts/LarsseitBold.otf') format('opentype');font-weight:600 700;font-style:normal;font-display:swap}
+    @font-face{font-family:'Larsseit';src:url('fonts/LarsseitBoldItalic.otf') format('opentype');font-weight:600 700;font-style:italic;font-display:swap}
+    @font-face{font-family:'Larsseit';src:url('fonts/LarsseitExtraBold.otf') format('opentype');font-weight:800 900;font-style:normal;font-display:swap}
+    @font-face{font-family:'Larsseit';src:url('fonts/LarsseitExtraBoldItalic.otf') format('opentype');font-weight:800 900;font-style:italic;font-display:swap}
+    @font-face{font-family:'Queens Compressed';src:url('fonts/QueensCompressedTrial-MediumItalic.ttf') format('truetype');font-weight:300 900;font-style:italic;font-display:swap}
+
+    :root{
+      --font-ui:'Larsseit','Helvetica Neue',Arial,sans-serif;
+      --font-label:'Queens Compressed','Larsseit','Helvetica Neue',Arial,serif;
+      --font-num:'Larsseit','Helvetica Neue',Arial,sans-serif;
+      --alert:#ED1C24;
+      --success:#2FA84F;
+    }
+
+    *,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{margin:0;padding:0;height:100%;overflow:hidden;font-family:var(--font-ui);background:#4a4a4a}
+    #root{height:100%;display:flex;align-items:stretch}
+
+    /* Desktop: grey stage, phone frame centred */
+    @media(min-width:641px){
+      html,body{background:#7d7d7d;overflow:auto}
+      #root{min-height:100vh;align-items:center;justify-content:center;padding:40px 16px}
+    }
+
+    /* Smooth momentum scroll for the folder list */
+    .scroll-y{overflow-y:auto;-webkit-overflow-scrolling:touch}
+  </style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+
+<script type="text/babel">
+/* ─────────────────────────────────────────────
+   HOFT Merchandising App
+   Single-file build — works on iPhone & desktop
+───────────────────────────────────────────── */
+const { useState } = React;
+
+// True on a real phone; false on desktop (shows phone frame)
+const IS_MOBILE = window.innerWidth <= 640;
+
+/* ══════════════════════════════════════════
+   DATA
+══════════════════════════════════════════ */
+const REPS = [
+  "Marc Tremblay", "Sophie Gagnon", "Luc Bélanger",
+  "Émilie Roy", "David Côté", "Karine Pelletier",
+];
+
+const STORES = [
+  { id:"BR-HD",  banner:"HD",    name:"BROSSARD",           prov:"QC", ytd:19328.48, lastYear:33328.48, lastVisit:"10-11-2025" },
+  { id:"BB-HD",  banner:"HD",    name:"BEAUBIEN",            prov:"QC", ytd:39328.48, lastYear:33328.48, lastVisit:"10-11-2025" },
+  { id:"41030",  banner:"RONA+", name:"Québec",              prov:"QC", ytd:13507.89, lastYear:12143.85, lastVisit:"28-03-2026" },
+  { id:"41050",  banner:"RONA",  name:"Trois-Rivières",      prov:"QC", ytd:13946.12, lastYear:18418.06, lastVisit:"02-04-2026" },
+  { id:"41060",  banner:"RONA",  name:"Chicoutimi",          prov:"QC", ytd:9271.76,  lastYear:10839.62, lastVisit:"15-03-2026" },
+  { id:"41380",  banner:"RONA",  name:"Granby",              prov:"QC", ytd:10151.14, lastYear:3705.96,  lastVisit:"21-04-2026" },
+  { id:"42360",  banner:"RONA",  name:"Alma",                prov:"QC", ytd:8457.98,  lastYear:3810.66,  lastVisit:"19-04-2026" },
+  { id:"76210",  banner:"RONA+", name:"Ste-Foy",             prov:"QC", ytd:21640.00, lastYear:16985.20, lastVisit:"11-04-2026" },
+  { id:"41010",  banner:"RONA+", name:"Carrefour Laval",     prov:"QC", ytd:884.51,   lastYear:664.50,   lastVisit:"08-04-2026" },
+  { id:"41110",  banner:"RONA+", name:"Galeries d'Anjou",    prov:"QC", ytd:23.38,    lastYear:2229.54,  lastVisit:"30-03-2026" },
+  { id:"TS-HD",  banner:"HD",    name:"TASCHEREAU",          prov:"QC", ytd:27110.05, lastYear:24880.00, lastVisit:"05-04-2026" },
+  { id:"33040",  banner:"RONA",  name:"Hamilton (Rymal)",    prov:"ON", ytd:6420.10,  lastYear:9120.44,  lastVisit:"26-03-2026" },
+];
+
+const BANNER = { HD:"HOME DEPOT", RONA:"RONA", "RONA+":"RONA+" };
+
+const CHECKLIST = [
+  { id:"oos",  q:"Any out of stock?" },
+  { id:"pop",  q:"Is the POP displayed correctly?" },
+  { id:"comp", q:"Competitor presence!" },
+];
+
+const PRODUCTS = [
+  'POTEAU LIGNE KIT C AL.3X72"NR','POTEAU FIN KIT A AL.3X72"NR','POTEAU COIN KIT B AL.3X72"NR',
+  "PLANCHE CLOT.1X6\"X6'-4/PK BN","PLANCHE CLOT.1X6\"X6'-4/PK NY","PLANCHE CLOT.1X6\"X6'-4/PK GG",
+  "PANNEAU REMPL.CLOT. NR 6' PK4",'KIT POTEAU CLOTURE C8 96" ENT.','KIT POTEAU CLOTURE A6 ALUM. NR',
+  'KIT POTEAU CLOTURE A8 ENTERRE','KIT POTEAU COIN B8 ENTERRE','CAP.POTEAU SOLAIRE NR ALU. 3"',
+  'COUVERCLE PLAQUE DE BASE 3X3"','ENS. POTEAU FIN 44X3" NR SOLU.','ENS.POTEAU LIGNE 44X3" NR SOLU',
+  'ENS. POTEAU COIN 44X3" NR SOLU','KIT BARRIERE AJUST ALUM 2X71"','JARDINIERE NOIR GRAND 24" HOFT',
+  'JARDINIERE MED. 15" NR.','CROCHET NOIR ACIER 3" 2/PK','LATTE REMPL. 31" NR SOLUTIONS',
+  'SCELLANT KIT VERRE 168" NOIR','TABLETTE ACIER GALV. 24" NR.','ESPACEUR NOIR ALUM.1/2" 12/PK',
+  'PRES.PLANCHE CLOTURE 48UN','KIT POTEAU CLOTURE A6 ENTERRE','ENS. BARRIERE 36" NR SOLUTIONS',
+  'POTEAU PORTAIL KIT D AL.3X72"','JARDINIERE PETIT 10" NR.','CROCHET DOUBLE NR 5" 2/PK',
+];
+
+const HEAT = ['#6B3A2A','#B5531F','#E8731C','#F2901C','#F6B41C','#F7C915'];
+
+function fmtMoney(n) {
+  const [intp, dec] = n.toFixed(2).replace('.', ',').split(',');
+  return intp.replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ',' + dec + '$';
+}
+
+/* ══════════════════════════════════════════
+   iOS DEVICE FRAME  (desktop only)
+══════════════════════════════════════════ */
+function IOSStatusBar() {
+  return (
+    <div style={{
+      display:'flex', alignItems:'center', justifyContent:'space-between',
+      padding:'17px 28px 8px', position:'relative', zIndex:20,
+    }}>
+      <span style={{fontFamily:'-apple-system,system-ui',fontWeight:600,fontSize:16,color:'#fff'}}>9:41</span>
+      <div style={{display:'flex',alignItems:'center',gap:7}}>
+        <svg width="19" height="12" viewBox="0 0 19 12">
+          <rect x="0" y="7.5" width="3.2" height="4.5" rx=".7" fill="#fff"/>
+          <rect x="4.8" y="5" width="3.2" height="7" rx=".7" fill="#fff"/>
+          <rect x="9.6" y="2.5" width="3.2" height="9.5" rx=".7" fill="#fff"/>
+          <rect x="14.4" y="0" width="3.2" height="12" rx=".7" fill="#fff"/>
+        </svg>
+        <svg width="27" height="13" viewBox="0 0 27 13">
+          <rect x=".5" y=".5" width="23" height="12" rx="3.5" stroke="#fff" strokeOpacity=".35" fill="none"/>
+          <rect x="2" y="2" width="20" height="9" rx="2" fill="#fff"/>
+          <path d="M25 4.5V8.5C25.8 8.2 26.5 7.2 26.5 6.5 26.5 5.8 25.8 4.8 25 4.5Z" fill="#fff" fillOpacity=".4"/>
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+function IOSDevice({ children }) {
+  return (
+    <div style={{
+      width:393, borderRadius:52, overflow:'hidden', position:'relative', flexShrink:0,
+      background:'#1a1a1a',
+      boxShadow:'0 0 0 10px #1a1a1a, 0 0 0 12px #2a2a2a, 0 40px 80px rgba(0,0,0,.4)',
+    }}>
+      {/* dynamic island */}
+      <div style={{
+        position:'absolute', top:12, left:'50%', transform:'translateX(-50%)',
+        width:126, height:37, borderRadius:24, background:'#000', zIndex:50,
+      }}/>
+      {/* status bar — sits above content on dark splash */}
+      <div style={{position:'absolute',top:0,left:0,right:0,zIndex:20}}>
+        <IOSStatusBar/>
+      </div>
+      {/* screen content */}
+      <div style={{minHeight:852}}>
+        {children}
+      </div>
+      {/* home indicator */}
+      <div style={{
+        position:'absolute', bottom:8, left:0, right:0, zIndex:60,
+        display:'flex', justifyContent:'center', pointerEvents:'none',
+      }}>
+        <div style={{width:139,height:5,borderRadius:100,background:'rgba(255,255,255,.5)'}}/>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE SHELL
+   - Mobile: fixed full-viewport, no frame
+   - Desktop: grey stage + phone frame
+══════════════════════════════════════════ */
+function Shell({ children }) {
+  if (IS_MOBILE) {
+    return (
+      <div style={{
+        position:'fixed', inset:0,
+        display:'flex', flexDirection:'column',
+        overflow:'hidden',
+      }}>
+        {children}
+      </div>
+    );
+  }
+  return <IOSDevice>{children}</IOSDevice>;
+}
+
+/* ══════════════════════════════════════════
+   SPLASH SCREEN
+══════════════════════════════════════════ */
+function Pill({ label, value, onClick }) {
+  const filled = !!value;
+  return (
+    <button
+      onClick={onClick}
+      onTouchStart={e => e.currentTarget.style.transform='scale(.97)'}
+      onTouchEnd={e => e.currentTarget.style.transform='scale(1)'}
+      onMouseDown={e => e.currentTarget.style.transform='scale(.97)'}
+      onMouseUp={e => e.currentTarget.style.transform='scale(1)'}
+      onMouseLeave={e => e.currentTarget.style.transform='scale(1)'}
+      style={{
+        width:'100%', borderRadius:999, cursor:'pointer',
+        background: filled ? '#fff' : 'rgba(255,255,255,.12)',
+        border: filled ? '1.5px solid rgba(0,0,0,.1)' : '1.5px solid rgba(255,255,255,.3)',
+        color: filled ? '#1b1b1b' : '#fff',
+        padding:'16px 22px',
+        display:'flex', alignItems:'center', justifyContent:'space-between',
+        fontFamily:'var(--font-ui)',
+        transition:'transform .12s',
+      }}>
+      <span style={{fontWeight:800,letterSpacing:'.06em',fontSize:14}}>
+        {label}
+      </span>
+      {filled
+        ? <span style={{fontWeight:600,fontSize:14,marginLeft:12,color:'#1b1b1b',maxWidth:'55%',textAlign:'right',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{value}</span>
+        : <span style={{fontSize:20,opacity:.5,lineHeight:1}}>›</span>
+      }
+    </button>
+  );
+}
+
+function PickerSheet({ open, title, children, onClose }) {
+  return (
+    <div style={{
+      position:'absolute', inset:0, zIndex:80,
+      pointerEvents: open ? 'auto' : 'none',
+    }}>
+      <div onClick={onClose} style={{
+        position:'absolute', inset:0, background:'rgba(0,0,0,.5)',
+        opacity: open ? 1 : 0, transition:'opacity .26s',
+      }}/>
+      <div style={{
+        position:'absolute', left:0, right:0, bottom:0,
+        background:'#fff', borderRadius:'20px 20px 0 0',
+        maxHeight:'78%', display:'flex', flexDirection:'column',
+        transform: open ? 'translateY(0)' : 'translateY(110%)',
+        transition:'transform .34s cubic-bezier(.22,.61,.36,1)',
+        boxShadow:'0 -8px 32px rgba(0,0,0,.22)',
+        paddingBottom: IS_MOBILE ? 'max(20px, env(safe-area-inset-bottom))' : '24px',
+      }}>
+        {/* drag handle */}
+        <div style={{display:'flex',justifyContent:'center',paddingTop:10,flexShrink:0}}>
+          <div style={{width:40,height:5,borderRadius:99,background:'#d2d2d2'}}/>
+        </div>
+        {/* sheet title */}
+        <div style={{
+          fontFamily:'var(--font-label)', fontWeight:800, fontStyle:'italic',
+          fontSize:22, padding:'10px 22px 6px', color:'#1b1b1b', flexShrink:0,
+        }}>{title}</div>
+        <div className="scroll-y" style={{padding:'4px 14px 8px'}}>{children}</div>
+      </div>
+    </div>
+  );
+}
+
+function SplashScreen({ rep, store, onPickRep, onPickStore, onEnter }) {
+  const [sheet, setSheet] = useState(null); // 'who' | 'where' | null
+
+  const handleRep   = r => { onPickRep(r);   setSheet(null); if (store) onEnter(); };
+  const handleStore = s => { onPickStore(s);  setSheet(null); if (rep)   onEnter(); };
+
+  const rowStyle = active => ({
+    display:'flex', alignItems:'center', justifyContent:'space-between',
+    padding:'14px 16px', borderRadius:12, cursor:'pointer', marginBottom:8,
+    background: active ? '#141414' : '#f4f4f4',
+    color: active ? '#fff' : '#1b1b1b',
+    fontFamily:'var(--font-ui)',
+  });
+
+  return (
+    <div style={{
+      position:'absolute', inset:0, background:'#4a4a4a',
+      display:'flex', flexDirection:'column', alignItems:'center',
+      justifyContent:'space-between',
+      paddingTop: IS_MOBILE ? 'max(80px, calc(env(safe-area-inset-top) + 56px))' : '90px',
+      paddingBottom: IS_MOBILE ? 'max(48px, calc(env(safe-area-inset-bottom) + 32px))' : '60px',
+      paddingLeft:'28px', paddingRight:'28px',
+    }}>
+      {/* logo — inverted so black PNG reads white on dark */}
+      <div style={{flex:1, display:'flex', alignItems:'center', justifyContent:'center'}}>
+        <img src="assets/hoft-logo.png" alt="HOFT merchandising"
+          style={{width: IS_MOBILE ? Math.min(window.innerWidth - 80, 220) : 200,
+                  filter:'brightness(0) invert(1)'}}/>
+      </div>
+
+      {/* pickers */}
+      <div style={{width:'100%', display:'flex', flexDirection:'column', gap:12}}>
+        <Pill label="WHO?"   value={rep}   onClick={() => setSheet('who')}/>
+        <Pill label="WHERE?" value={store ? `${BANNER[store.banner]} · ${store.name}` : ''} onClick={() => setSheet('where')}/>
+      </div>
+
+      {/* WHO picker sheet */}
+      <PickerSheet open={sheet==='who'} title="who is visiting?" onClose={() => setSheet(null)}>
+        {REPS.map(r => (
+          <div key={r} style={rowStyle(r===rep)} onClick={() => handleRep(r)}>
+            <span style={{fontWeight:600,fontSize:15}}>{r}</span>
+            {r===rep && <span>✓</span>}
+          </div>
+        ))}
+      </PickerSheet>
+
+      {/* WHERE picker sheet */}
+      <PickerSheet open={sheet==='where'} title="which store?" onClose={() => setSheet(null)}>
+        {STORES.map(s => (
+          <div key={s.id} style={rowStyle(store && s.id===store.id)} onClick={() => handleStore(s)}>
+            <span>
+              <span style={{fontWeight:800,fontSize:14,letterSpacing:'.02em'}}>{BANNER[s.banner]}</span>
+              <span style={{fontWeight:500,fontSize:14,opacity:.85}}> · {s.name}</span>
+              <span style={{display:'block',fontSize:11,opacity:.5,marginTop:2}}>{s.prov} · #{s.id}</span>
+            </span>
+            {store && s.id===store.id && <span>✓</span>}
+          </div>
+        ))}
+      </PickerSheet>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════
+   FOLDER CONTENTS
+══════════════════════════════════════════ */
+function Row({ label, value, strong }) {
+  return (
+    <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',padding:'7px 0',borderBottom:'1px solid #f0f0f0'}}>
+      <span style={{fontFamily:'var(--font-ui)',fontSize:13,fontWeight:700,textTransform:'uppercase',letterSpacing:'.02em',color:'#4a4a4a'}}>{label}</span>
+      <span style={{fontFamily:'var(--font-num)',fontVariantNumeric:'tabular-nums',fontWeight:700,fontSize:16,color: strong ? '#141414' : '#1b1b1b'}}>{value}</span>
+    </div>
+  );
+}
+
+function PhotoTile({ idx, photo, onPick, round }) {
+  const c = HEAT[idx % HEAT.length];
+  const onChange = e => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = () => onPick(r.result);
+    r.readAsDataURL(f);
+  };
+  const radius = round ? '50%' : '8px';
+  return (
+    <label style={{
+      width:'100%', aspectRatio:'1', borderRadius: radius, cursor:'pointer',
+      background: photo ? '#000' : (round ? c : '#f4f4f4'),
+      border: !round && !photo ? '1.5px dashed #bcbcbc' : 'none',
+      position:'relative', overflow:'hidden',
+      display:'flex', alignItems:'center', justifyContent:'center',
+      color: round ? 'rgba(255,255,255,.92)' : '#7d7d7d', fontSize:28, fontWeight:300,
+    }}>
+      {photo
+        ? <img src={photo} alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover'}}/>
+        : '+'}
+      {photo && round && <span style={{position:'absolute',inset:0,borderRadius:'50%',boxShadow:'inset 0 0 0 3px rgba(255,255,255,.8)'}}/>}
+      <input type="file" accept="image/*" capture="environment" onChange={onChange} style={{display:'none'}}/>
+    </label>
+  );
+}
+
+function InfoFolder({ store }) {
+  const up = store.ytd >= store.lastYear;
+  return (
+    <div>
+      <div style={{fontFamily:'var(--font-ui)',fontWeight:800,fontSize:18,letterSpacing:'.01em',color:'#141414',marginBottom:14}}>
+        {BANNER[store.banner]} — {store.name.toUpperCase()}
+      </div>
+      <Row label="Year to date" value={fmtMoney(store.ytd)} strong/>
+      <Row label="Last year"    value={fmtMoney(store.lastYear)}/>
+      <button style={{
+        width:'100%', border:'none', borderRadius:999, margin:'16px 0',
+        padding:'14px 0', cursor:'pointer',
+        fontFamily:'var(--font-ui)', fontWeight:800, fontStyle:'italic',
+        letterSpacing:'.05em', fontSize:16, color:'#fff',
+        background: up ? '#2FA84F' : '#ED1C24',
+      }}>{up ? 'CONGRATS!' : 'WHY?'}</button>
+      <div style={{fontFamily:'var(--font-ui)',fontSize:13,color:'#4a4a4a',lineHeight:1.8}}>
+        <div><b>Last visit:</b> {store.lastVisit}</div>
+        <div style={{marginTop:4}}>– Stock Issues</div>
+        <div>– Knowledge</div>
+        <div style={{color:'#7d7d7d'}}>– MORE INFO</div>
+      </div>
+    </div>
+  );
+}
+
+function StartFolder({ captures, setCaptures }) {
+  const setPhoto = (i, url) => setCaptures(c => ({...c, [i]: url}));
+  const done = Object.values(captures).filter(Boolean).length;
+  return (
+    <div>
+      <p style={{fontFamily:'var(--font-ui)',fontSize:14,fontWeight:600,color:'#1b1b1b',lineHeight:1.45,marginBottom:4,marginTop:0}}>
+        Photos when you arrived: <span style={{color:'#ED1C24'}}>do not replace any product!</span>
+      </p>
+      <p style={{fontFamily:'var(--font-ui)',fontSize:13,color:'#7d7d7d',marginTop:0,marginBottom:16}}>
+        (we want the real thing) — tap a circle to open camera
+      </p>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:14}}>
+        {[0,1,2,3,4,5].map(i => (
+          <PhotoTile key={i} idx={i} photo={captures[i]} onPick={url => setPhoto(i, url)} round/>
+        ))}
+      </div>
+      <div style={{marginTop:14,fontFamily:'var(--font-ui)',fontSize:12,color:'#7d7d7d',textAlign:'center'}}>
+        {done}/6 arrival photos captured
+      </div>
+    </div>
+  );
+}
+
+function ChecklistFolder({ answers, setAnswers, missing, setMissing }) {
+  const [showProds, setShowProds] = useState(false);
+  const toggleAns  = id => setAnswers(a => ({...a, [id]: !a[id]}));
+  const toggleProd = p  => setMissing(m => m.includes(p) ? m.filter(x=>x!==p) : [...m, p]);
+  return (
+    <div>
+      {CHECKLIST.map(item => {
+        const on = !!answers[item.id];
+        return (
+          <div key={item.id} style={{
+            display:'flex', alignItems:'center', justifyContent:'space-between', gap:12,
+            padding:'12px 14px', borderRadius:12, background:'#f4f4f4', marginBottom:10,
+          }}>
+            <span style={{fontFamily:'var(--font-ui)',fontWeight:700,fontSize:13,textTransform:'uppercase',letterSpacing:'.01em',color:'#1b1b1b',lineHeight:1.3,flex:1}}>{item.q}</span>
+            <button onClick={() => toggleAns(item.id)} style={{
+              flexShrink:0, border:'none', borderRadius:999, padding:'9px 20px', cursor:'pointer',
+              fontFamily:'var(--font-ui)', fontWeight:800, fontSize:13, letterSpacing:'.05em',
+              background: on ? '#141414' : '#d2d2d2',
+              color: on ? '#fff' : '#3a3a3a',
+              transition:'background .15s',
+            }}>YES</button>
+          </div>
+        );
+      })}
+
+      <button onClick={() => setShowProds(s=>!s)} style={{
+        width:'100%', border:'none', borderRadius:12, padding:'13px 16px', marginTop:2, cursor:'pointer',
+        background:'#8f8f8f', color:'#fff',
+        fontFamily:'var(--font-ui)', fontWeight:700, fontSize:13,
+        display:'flex', justifyContent:'space-between', alignItems:'center',
+      }}>
+        <span>select missing products ({PRODUCTS.length} options)</span>
+        <span style={{fontWeight:800}}>{missing.length ? missing.length : showProds ? '▲' : '▼'}</span>
+      </button>
+
+      <div style={{maxHeight: showProds ? 320 : 0, overflow:'hidden', transition:'max-height .34s cubic-bezier(.22,.61,.36,1)'}}>
+        <div className="scroll-y" style={{maxHeight:320, marginTop:10}}>
+          {PRODUCTS.map(p => {
+            const sel = missing.includes(p);
+            return (
+              <div key={p} onClick={() => toggleProd(p)} style={{
+                display:'flex', alignItems:'center', gap:10, padding:'9px 8px', cursor:'pointer',
+                borderBottom:'1px solid #ededed',
+              }}>
+                <span style={{
+                  width:20, height:20, borderRadius:5, flexShrink:0,
+                  border: sel ? 'none' : '2px solid #c4c4c4',
+                  background: sel ? '#ED1C24' : '#fff',
+                  display:'flex', alignItems:'center', justifyContent:'center',
+                  color:'#fff', fontSize:13, fontWeight:700,
+                }}>{sel ? '✓' : ''}</span>
+                <span style={{fontFamily:'var(--font-ui)',fontSize:12.5,color:'#1b1b1b'}}>{p}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PicturesFolder({ pics, setPics }) {
+  const onChange = e => {
+    Array.from(e.target.files||[]).forEach(f => {
+      const r = new FileReader();
+      r.onload = () => setPics(p => [...p, r.result]);
+      r.readAsDataURL(f);
+    });
+    e.target.value = '';
+  };
+  return (
+    <div>
+      <p style={{fontFamily:'var(--font-ui)',fontSize:14,fontWeight:600,color:'#1b1b1b',marginTop:0,marginBottom:14}}>
+        After photos — show the finished display.
+      </p>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:12}}>
+        {pics.map((url,i) => (
+          <div key={i} style={{width:'100%',aspectRatio:'1',borderRadius:8,overflow:'hidden',background:'#000'}}>
+            <img src={url} alt="after" style={{width:'100%',height:'100%',objectFit:'cover'}}/>
+          </div>
+        ))}
+        {/* add tile */}
+        <label style={{
+          width:'100%', aspectRatio:'1', borderRadius:8, cursor:'pointer',
+          background:'#f4f4f4', border:'1.5px dashed #bcbcbc',
+          display:'flex', alignItems:'center', justifyContent:'center',
+          color:'#7d7d7d', fontSize:28,
+        }}>
+          +
+          <input type="file" accept="image/*" capture="environment" multiple onChange={onChange} style={{display:'none'}}/>
+        </label>
+      </div>
+      <div style={{marginTop:12,fontFamily:'var(--font-ui)',fontSize:12,color:'#7d7d7d',textAlign:'center'}}>
+        {pics.length} photo{pics.length===1?'':'s'} added
+      </div>
+    </div>
+  );
+}
+
+function CompleteFolder({ rep, store, summary, onComplete, completed }) {
+  if (completed) {
+    return (
+      <div style={{textAlign:'center',padding:'8px 0 4px'}}>
+        <div style={{width:64,height:64,borderRadius:'50%',background:'#2FA84F',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:32,margin:'0 auto 14px'}}>✓</div>
+        <div style={{fontFamily:'var(--font-label)',fontWeight:800,fontStyle:'italic',fontSize:24,color:'#141414'}}>Visit logged</div>
+        <p style={{fontFamily:'var(--font-ui)',fontSize:13,color:'#7d7d7d',marginTop:6}}>
+          {BANNER[store.banner]} · {store.name} — {rep}
+        </p>
+      </div>
+    );
+  }
+  return (
+    <div>
+      <p style={{fontFamily:'var(--font-ui)',fontSize:14,fontWeight:600,color:'#1b1b1b',marginTop:0,marginBottom:12}}>
+        Review &amp; submit this visit.
+      </p>
+      <div style={{background:'#f4f4f4',borderRadius:12,padding:'12px 14px',marginBottom:16}}>
+        <Row label="Arrival photos" value={`${summary.captures}/6`}/>
+        <Row label="Checklist"      value={`${summary.answered}/3`}/>
+        <Row label="Missing SKUs"   value={summary.missing}/>
+        <Row label="After photos"   value={summary.pics}/>
+      </div>
+      <button onClick={onComplete} style={{
+        width:'100%', border:'none', borderRadius:999, padding:'15px 0', cursor:'pointer',
+        background:'#141414', color:'#fff',
+        fontFamily:'var(--font-ui)', fontWeight:800, fontStyle:'italic',
+        letterSpacing:'.05em', fontSize:16,
+      }}>COMPLETE VISIT</button>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════
+   FOLDER ACCORDION
+══════════════════════════════════════════ */
+const GRAY = ['#e4e4e4','#d2d2d2','#bcbcbc','#a6a6a6','#8f8f8f'];
+
+function FolderAccordion({ active, setActive, folders }) {
+  return (
+    <div style={{display:'flex',flexDirection:'column',gap:10,padding:'6px 16px 32px'}}>
+      {folders.map((f, i) => {
+        const isActive = i === active;
+        const labelColor = isActive ? '#141414' : (i >= 3 ? '#fff' : '#1b1b1b');
+        return (
+          <div key={f.key} style={{
+            borderRadius:14, overflow:'hidden',
+            background: isActive ? '#fff' : GRAY[i],
+            border: isActive ? '1px solid #e3e3e3' : 'none',
+            boxShadow: isActive ? '0 4px 16px rgba(0,0,0,.12)' : 'inset 0 1px 0 rgba(255,255,255,.4)',
+            transition:'background .26s, box-shadow .26s',
+          }}>
+            <button
+              onClick={() => setActive(isActive ? -1 : i)}
+              style={{
+                width:'100%', border:'none', background:'transparent', cursor:'pointer',
+                padding:'13px 18px',
+                display:'flex', alignItems:'center', justifyContent:'space-between',
+                fontFamily:'var(--font-label)', fontWeight:800, fontStyle:'italic',
+                fontSize:23, letterSpacing:'-.01em', color:labelColor, textAlign:'left',
+              }}>
+              <span>{f.label}</span>
+              {f.badge != null && (
+                <span style={{
+                  fontFamily:'var(--font-ui)', fontStyle:'normal', fontWeight:800, fontSize:11,
+                  minWidth:20, height:20, padding:'0 6px', borderRadius:999,
+                  background: isActive ? '#141414' : 'rgba(0,0,0,.2)', color:'#fff',
+                  display:'flex', alignItems:'center', justifyContent:'center',
+                }}>{f.badge}</span>
+              )}
+            </button>
+            <div style={{
+              maxHeight: isActive ? 1600 : 0, overflow:'hidden',
+              transition:'max-height .42s cubic-bezier(.22,.61,.36,1)',
+            }}>
+              <div style={{padding:'0 18px 18px'}}>{f.content}</div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════
+   MAIN APP
+══════════════════════════════════════════ */
+function AppHeader({ rep, store, onChange }) {
+  return (
+    <>
+      <div style={{
+        display:'flex', alignItems:'center', justifyContent:'center',
+        padding: IS_MOBILE ? '10px 0 10px' : '10px 0 10px',
+        borderBottom:'1px solid #ededed', background:'#fff', flexShrink:0,
+      }}>
+        <img src="assets/hoft-wordmark.png" alt="HOFT" style={{height:26}}/>
+      </div>
+      <div style={{
+        display:'flex', alignItems:'center', justifyContent:'space-between',
+        padding:'8px 18px', background:'#fafafa', borderBottom:'1px solid #ededed', flexShrink:0,
+      }}>
+        <span style={{fontFamily:'var(--font-ui)',fontSize:12,color:'#7d7d7d',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',marginRight:8}}>
+          {rep} · {BANNER[store.banner]} {store.name}
+        </span>
+        <button onClick={onChange} style={{
+          border:'none', background:'transparent', color:'#141414',
+          fontFamily:'var(--font-ui)', fontSize:12, fontWeight:700, cursor:'pointer',
+          flexShrink:0, padding:'2px 0',
+        }}>change</button>
+      </div>
+    </>
+  );
+}
+
+function HoftApp() {
+  const [screen, setScreen]   = useState('splash');
+  const [rep, setRep]         = useState(null);
+  const [store, setStore]     = useState(null);
+  const [active, setActive]   = useState(0);
+  const [captures, setCaptures] = useState({});
+  const [answers, setAnswers]   = useState({});
+  const [missing, setMissing]   = useState([]);
+  const [pics, setPics]         = useState([]);
+  const [completed, setCompleted] = useState(false);
+
+  const capturesDone = Object.values(captures).filter(Boolean).length;
+  const answered     = Object.values(answers).filter(Boolean).length;
+
+  if (screen === 'splash') {
+    return (
+      <Shell>
+        <SplashScreen
+          rep={rep} store={store}
+          onPickRep={setRep} onPickStore={setStore}
+          onEnter={() => setScreen('app')}
+        />
+      </Shell>
+    );
+  }
+
+  const folders = [
+    {
+      key:'info', label:'info',
+      content:<InfoFolder store={store}/>,
+    },
+    {
+      key:'start', label:'start', badge: capturesDone || null,
+      content:<StartFolder captures={captures} setCaptures={setCaptures}/>,
+    },
+    {
+      key:'check', label:'check list', badge: (answered + (missing.length ? 1 : 0)) || null,
+      content:<ChecklistFolder answers={answers} setAnswers={setAnswers} missing={missing} setMissing={setMissing}/>,
+    },
+    {
+      key:'pics', label:'pictures', badge: pics.length || null,
+      content:<PicturesFolder pics={pics} setPics={setPics}/>,
+    },
+    {
+      key:'done', label:'complete',
+      content:<CompleteFolder rep={rep} store={store} completed={completed}
+        summary={{captures:capturesDone, answered, missing:missing.length, pics:pics.length}}
+        onComplete={() => setCompleted(true)}/>,
+    },
+  ];
+
+  return (
+    <Shell>
+      <div style={{
+        height:'100%', display:'flex', flexDirection:'column', background:'#fff',
+        minHeight: IS_MOBILE ? undefined : 852,
+      }}>
+        {/* On real iPhone, push header below the status bar notch */}
+        {IS_MOBILE && <div style={{height:'env(safe-area-inset-top)',background:'#fff',flexShrink:0}}/>}
+        <AppHeader rep={rep} store={store} onChange={() => setScreen('splash')}/>
+        <div className="scroll-y" style={{flex:1}}>
+          <FolderAccordion active={active} setActive={setActive} folders={folders}/>
+        </div>
+        {/* home indicator safe area */}
+        {IS_MOBILE && <div style={{height:'env(safe-area-inset-bottom)',background:'#fff',flexShrink:0}}/>}
+      </div>
+    </Shell>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<HoftApp/>);
+</script>
+</body>
+</html>
