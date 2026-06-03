@@ -1,6 +1,9 @@
 import React from 'react'
 import { promptCapture } from '../lib/camera'
-import { HEAT_COLORS } from '../data/stores'
+
+const HEAT_COLORS = [
+  '#6B3A2A', '#B5531F', '#E8731C', '#F2901C', '#F6B41C', '#F7C915',
+]
 
 interface Props {
   idx: number

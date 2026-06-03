@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import type { Store, Folder, PhotoType } from './types'
-import { STORES, BANNER_LABEL } from './data/stores'
+import type { Store, Folder } from './types'
+import { STORES, CONFIG } from './data/stores'
 import { useSafeArea } from './hooks/useSafeArea'
 import { useVisit } from './hooks/useVisit'
 import { useSync } from './hooks/useSync'
@@ -8,32 +8,37 @@ import { SplashScreen } from './components/SplashScreen'
 import { AppHeader } from './components/AppHeader'
 import { FolderAccordion } from './components/FolderAccordion'
 import { InfoFolder } from './components/folders/InfoFolder'
-import { StartFolder } from './components/folders/StartFolder'
+import { AssessmentFolder } from './components/folders/AssessmentFolder'
 import { ChecklistFolder } from './components/folders/ChecklistFolder'
-import { PicturesFolder } from './components/folders/PicturesFolder'
-import { CompleteFolder } from './components/folders/CompleteFolder'
+import { StaffFolder } from './components/folders/StaffFolder'
 import { Dashboard } from './pages/Dashboard'
+import { PickerSheet } from './components/PickerSheet'
+import { SignatureCapture } from './components/SignatureCapture'
 
 type Screen = 'splash' | 'audit' | 'dashboard'
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('splash')
-  const [rep, setRep]       = useState<string | null>(null)
-  const [store, setStore]   = useState<Store | null>(null)
+  const [rep, setRep] = useState<string | null>(null)
+  const [store, setStore] = useState<Store | null>(null)
   const [active, setActive] = useState(0)
+  const [showSignSheet, setShowSignSheet] = useState(false)
 
   const safeArea = useSafeArea()
-  const { visit, startVisit, setPhoto, setAnswer, setMissingProducts, setComments, setSignature, markStatus, resetVisit } = useVisit()
-  const { online, syncing, pendingCount, lastError, enqueue, flush } = useSync()
-
-  // ── Counts for folder badges ─────────────────────────────
-  const photoCount    = visit ? Object.values(visit.photos).filter(Boolean).length : 0
-  const answeredCount = visit ? Object.values(visit.answers).filter(v => v !== null).length : 0
+  const {
+    visit,
+    startVisit,
+    setSignature,
+    setAssessmentValue,
+    markStatus,
+    resetVisit,
+  } = useVisit()
+  const { online, syncing, enqueue, flush } = useSync()
 
   // ── Splash → Audit ───────────────────────────────────────
   const handleEnter = () => {
     if (!rep || !store) return
-    startVisit(rep, store.id, `${BANNER_LABEL[store.banner]} ${store.name}`)
+    startVisit(rep, store.id, store.name)
     setActive(0)
     setScreen('audit')
   }
@@ -41,6 +46,7 @@ export default function App() {
   // ── Complete visit ───────────────────────────────────────
   const handleComplete = async () => {
     if (!visit || !visit.signature) return
+    setShowSignSheet(false)
     markStatus('pending_sync')
     await enqueue({ ...visit, status: 'pending_sync' })
 
@@ -56,7 +62,7 @@ export default function App() {
     }
   }
 
-  // ── New visit (after complete) ───────────────────────────
+  // ── New visit (after complete or back) ───────────────────
   const handleNewVisit = async () => {
     await resetVisit()
     setRep(null)
@@ -80,20 +86,13 @@ export default function App() {
     return (
       <div className="screen">
         <SplashScreen
-          rep={rep} store={store}
-          onPickRep={setRep} onPickStore={setStore}
+          rep={rep}
+          store={store}
+          onPickRep={setRep}
+          onPickStore={setStore}
           onEnter={handleEnter}
           safeTop={safeArea.top}
         />
-        {/* Dashboard shortcut on splash */}
-        <button onClick={() => setScreen('dashboard')} style={{
-          position: 'absolute', bottom: `max(24px, calc(var(--safe-bottom) + 12px))`, right: 20,
-          border: 'none', background: 'rgba(255,255,255,0.12)', borderRadius: 999,
-          padding: '8px 14px', color: '#fff', fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 700,
-          cursor: 'pointer', WebkitTapHighlightColor: 'transparent',
-        }}>
-          📊 Dashboard
-        </button>
       </div>
     )
   }
@@ -101,82 +100,159 @@ export default function App() {
   // ── Audit ─────────────────────────────────────────────────
   if (!store || !rep || !visit) return null
 
+  const assessmentState = visit.assessmentState || {}
+
   const folders: Folder[] = [
     {
       key: 'info',
       label: 'info',
-      content: <InfoFolder store={store} />,
+      tint: '#CCCDCE',
+      content: <InfoFolder store={store} allStores={STORES} />,
     },
     {
-      key: 'start',
-      label: 'start',
-      badge: photoCount > 0 ? Object.keys(visit.photos).filter(k => ['bay_before','display_before'].includes(k) && visit.photos[k as PhotoType]).length || null : null,
+      key: 'assessment',
+      label: 'assessment',
+      tint: '#B4B6B7',
       content: (
-        <StartFolder
-          photos={visit.photos}
-          onPhoto={(type, url) => setPhoto(type, url)}
+        <AssessmentFolder
+          state={assessmentState}
+          onStateChange={setAssessmentValue}
         />
       ),
     },
     {
-      key: 'check',
-      label: 'check list',
-      badge: answeredCount || null,
+      key: 'check-list',
+      label: 'check-list',
+      tint: '#9EA0A1',
       content: (
         <ChecklistFolder
-          answers={visit.answers}
-          missingProducts={visit.missingProducts}
-          onAnswer={setAnswer}
-          onMissingProducts={setMissingProducts}
+          state={assessmentState}
+          onStateChange={setAssessmentValue}
         />
       ),
     },
     {
-      key: 'pics',
-      label: 'pictures',
-      badge: (['competitor','final'] as PhotoType[]).filter(t => !!visit.photos[t]).length || null,
-      content: (
-        <PicturesFolder
-          photos={visit.photos}
-          onPhoto={(type, url) => setPhoto(type, url)}
-        />
-      ),
-    },
-    {
-      key: 'done',
-      label: 'complete',
-      content: (
-        <CompleteFolder
-          rep={rep}
-          store={store}
-          visit={visit}
-          onSetComments={setComments}
-          onSetSignature={setSignature}
-          onComplete={handleComplete}
-        />
-      ),
+      key: 'staff',
+      label: 'staff interaction',
+      tint: '#8A8C8D',
+      content: <StaffFolder topics={CONFIG.staffTopics} />,
     },
   ]
 
   return (
-    <div className="screen" style={{ display: 'flex', flexDirection: 'column', background: '#fff' }}>
+    <div
+      className="screen"
+      style={{ display: 'flex', flexDirection: 'column', background: '#C7C8C9', overflow: 'hidden' }}
+    >
       <AppHeader
-        rep={rep}
-        store={store}
-        onChangeVisit={handleNewVisit}
+        onBack={handleNewVisit}
         onDashboard={() => setScreen('dashboard')}
         safeTop={safeArea.top}
-        online={online}
-        syncing={syncing}
-        pendingCount={pendingCount}
-        syncError={lastError}
       />
 
-      <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch' as React.CSSProperties['WebkitOverflowScrolling'] }}>
+      <div
+        style={{
+          flex: 1,
+          overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch' as React.CSSProperties['WebkitOverflowScrolling'],
+        }}
+      >
         <FolderAccordion active={active} setActive={setActive} folders={folders} />
+
+        {/* COMPLETE VISIT button */}
+        <div
+          style={{
+            padding: '4px 22px',
+            paddingBottom: Math.max(safeArea.bottom + 16, 46),
+            background: '#8A8C8D',
+          }}
+        >
+          <button
+            onClick={() => setShowSignSheet(true)}
+            style={{
+              width: '100%',
+              border: 'none',
+              borderRadius: 999,
+              padding: '16px',
+              cursor: 'pointer',
+              background: '#1c1c1c',
+              color: '#fff',
+              fontFamily: 'var(--font-label)',
+              fontWeight: 800,
+              fontSize: 14.5,
+              letterSpacing: '0.06em',
+              WebkitTapHighlightColor: 'transparent',
+            }}
+          >
+            COMPLETE VISIT
+          </button>
+        </div>
       </div>
 
-      <div style={{ height: safeArea.bottom, background: '#fff', flexShrink: 0 }} />
+      {/* Signature sheet */}
+      <PickerSheet
+        open={showSignSheet}
+        title="sign to complete"
+        onClose={() => setShowSignSheet(false)}
+      >
+        <div style={{ padding: '8px 6px 16px' }}>
+          <SignatureCapture
+            saved={visit.signature}
+            onSave={sig => {
+              setSignature(sig)
+            }}
+            onClear={() => setSignature(null)}
+          />
+          {visit.signature && (
+            <button
+              onClick={handleComplete}
+              style={{
+                marginTop: 12,
+                width: '100%',
+                border: 'none',
+                borderRadius: 999,
+                padding: '15px',
+                cursor: 'pointer',
+                background: '#1c1c1c',
+                color: '#fff',
+                fontFamily: 'var(--font-label)',
+                fontWeight: 800,
+                fontSize: 14,
+                letterSpacing: '0.06em',
+                WebkitTapHighlightColor: 'transparent',
+              }}
+            >
+              SUBMIT VISIT
+            </button>
+          )}
+          {visit.status === 'synced' && (
+            <div
+              style={{
+                marginTop: 12,
+                textAlign: 'center',
+                color: '#2f7d52',
+                fontWeight: 700,
+                fontSize: 14,
+              }}
+            >
+              Visit saved ✓
+            </div>
+          )}
+          {visit.status === 'error' && (
+            <div
+              style={{
+                marginTop: 12,
+                textAlign: 'center',
+                color: '#CF4631',
+                fontWeight: 700,
+                fontSize: 14,
+              }}
+            >
+              Error: {visit.errorMessage || 'Sync failed'}
+            </div>
+          )}
+        </div>
+      </PickerSheet>
     </div>
   )
 }

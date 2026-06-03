@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { storage } from '../lib/storage'
-import type { LocalVisit, PhotoType, ChecklistAnswers } from '../types'
+import type { LocalVisit, PhotoType, ChecklistAnswers, AssessmentState } from '../types'
 
 const CURRENT_VISIT_KEY = 'hoft_current_visit'
 
@@ -17,6 +17,7 @@ function newVisit(rep: string, storeId: string, storeName: string): LocalVisit {
     missingProducts: [],
     comments: '',
     signature: null,
+    assessmentState: {},
   }
 }
 
@@ -67,6 +68,44 @@ export function useVisit() {
     setVisit(v => v ? { ...v, signature } : v)
   }, [])
 
+  const setAssessmentValue = useCallback((key: string, value: unknown) => {
+    setVisit(v => {
+      if (!v) return v
+      const newState: AssessmentState = { ...v.assessmentState }
+      if (value === undefined || value === '' || value === false || value === null) {
+        delete newState[key]
+        // Also remove child keys (toggle cascade)
+        Object.keys(newState).forEach(k => {
+          if (k.startsWith(key + '/') || k.startsWith(key + ':') || k.startsWith(key + '#')) {
+            delete newState[k]
+          }
+        })
+      } else {
+        newState[key] = value as string | boolean | number
+      }
+      return { ...v, assessmentState: newState }
+    })
+  }, [])
+
+  const toggleAssessmentValue = useCallback((key: string) => {
+    setVisit(v => {
+      if (!v) return v
+      const newState: AssessmentState = { ...v.assessmentState }
+      if (newState[key]) {
+        delete newState[key]
+        // Cascade: remove all child keys
+        Object.keys(newState).forEach(k => {
+          if (k.startsWith(key + '/') || k.startsWith(key + ':') || k.startsWith(key + '#')) {
+            delete newState[k]
+          }
+        })
+      } else {
+        newState[key] = true
+      }
+      return { ...v, assessmentState: newState }
+    })
+  }, [])
+
   const markStatus = useCallback((status: LocalVisit['status'], extra?: Partial<LocalVisit>) => {
     setVisit(v => v ? { ...v, status, ...extra } : v)
   }, [])
@@ -84,6 +123,8 @@ export function useVisit() {
     setMissingProducts,
     setComments,
     setSignature,
+    setAssessmentValue,
+    toggleAssessmentValue,
     markStatus,
     resetVisit,
   }

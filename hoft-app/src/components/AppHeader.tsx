@@ -1,64 +1,77 @@
 import React from 'react'
-import type { Store } from '../types'
-import { BANNER_LABEL } from '../data/stores'
-import { SyncStatus } from './SyncStatus'
 
 interface Props {
-  rep: string
-  store: Store
-  onChangeVisit: () => void
+  onBack: () => void
   onDashboard: () => void
   safeTop?: number
-  online: boolean
-  syncing: boolean
-  pendingCount: number
-  syncError: string | null
 }
 
-export function AppHeader({
-  rep, store, onChangeVisit, onDashboard,
-  safeTop = 0, online, syncing, pendingCount, syncError,
-}: Props) {
+export function AppHeader({ onBack, onDashboard, safeTop = 0 }: Props) {
+  const circleBtn: React.CSSProperties = {
+    width: 36,
+    height: 36,
+    borderRadius: 999,
+    border: 'none',
+    background: 'rgba(0,0,0,0.06)',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+    WebkitTapHighlightColor: 'transparent',
+  }
+
   return (
-    <>
-      <div style={{ height: safeTop, background: '#fff', flexShrink: 0 }} />
+    <div
+      style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 40,
+        paddingTop: Math.max(safeTop + 14, 54),
+        paddingBottom: 14,
+        paddingLeft: 16,
+        paddingRight: 16,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        background: `linear-gradient(#E9EAEA, #CFD0D1)`,
+      }}
+    >
+      {/* Back button */}
+      <button onClick={onBack} style={circleBtn} title="Back">
+        <svg
+          width="11"
+          height="18"
+          viewBox="0 0 12 20"
+          fill="none"
+          stroke="#26241f"
+          strokeWidth="2.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M10 2L2 10l8 8" />
+        </svg>
+      </button>
 
-      {/* Wordmark bar */}
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '8px 14px', borderBottom: '1px solid #ededed', background: '#fff', flexShrink: 0,
-      }}>
-        <img src="/assets/hoft-wordmark.png" alt="HOFT" style={{ height: 24 }} />
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <SyncStatus online={online} syncing={syncing} pendingCount={pendingCount} error={syncError} />
-          <button onClick={onDashboard} style={{
-            border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 18, padding: 0,
-            WebkitTapHighlightColor: 'transparent',
-          }} title="Dashboard">
-            📊
-          </button>
-        </div>
-      </div>
+      {/* HOFT mark */}
+      <img src="/assets/hoft-mark.png" alt="HOFT" style={{ height: 24, display: 'block' }} />
 
-      {/* Rep + store strip */}
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '7px 16px', background: '#fafafa', borderBottom: '1px solid #ededed', flexShrink: 0,
-      }}>
-        <span style={{
-          fontFamily: 'var(--font-ui)', fontSize: 12, color: '#7d7d7d',
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginRight: 8,
-        }}>
-          {rep} · {BANNER_LABEL[store.banner]} {store.name}
-        </span>
-        <button onClick={onChangeVisit} style={{
-          border: 'none', background: 'transparent', color: '#141414',
-          fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0,
-          WebkitTapHighlightColor: 'transparent',
-        }}>
-          change
-        </button>
-      </div>
-    </>
+      {/* Dashboard / download button */}
+      <button onClick={onDashboard} style={circleBtn} title="Dashboard">
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#26241f"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M12 3v12M8 11l4 4 4-4" />
+          <path d="M5 20h14" />
+        </svg>
+      </button>
+    </div>
   )
 }

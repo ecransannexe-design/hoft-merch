@@ -1,92 +1,85 @@
 import React from 'react'
 import type { Folder } from '../types'
 
-const GRAY = ['#e4e4e4', '#d2d2d2', '#bcbcbc', '#a6a6a6', '#8f8f8f']
-
 interface Props {
   active: number
   setActive: (i: number) => void
   folders: Folder[]
 }
 
+function Caret({ open }: { open: boolean }) {
+  return (
+    <svg
+      width={18}
+      height={18}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="#26241f"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0 }}
+    >
+      <path d="M6 15l6-6 6 6" />
+    </svg>
+  )
+}
+
 export function FolderAccordion({ active, setActive, folders }: Props) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: '6px 16px 32px' }}>
+    <div style={{ position: 'relative' }}>
       {folders.map((f, i) => {
-        const isActive = i === active
-        const labelColor = isActive ? '#141414' : i >= 3 ? '#fff' : '#1b1b1b'
+        const isFirst = i === 0
+        const isOpen = i === active
 
         return (
           <div
             key={f.key}
             style={{
-              borderRadius: 14,
-              overflow: 'hidden',
-              background: isActive ? '#fff' : GRAY[i],
-              border: isActive ? '1px solid #e3e3e3' : 'none',
-              boxShadow: isActive
-                ? '0 4px 16px rgba(0,0,0,0.12)'
-                : 'inset 0 1px 0 rgba(255,255,255,0.4)',
-              transition: 'background 0.26s, box-shadow 0.26s',
+              position: 'relative',
+              zIndex: i + 1,
+              marginTop: isFirst ? 0 : -24,
+              background: f.tint,
+              borderTopLeftRadius: 30,
+              borderTopRightRadius: 30,
             }}
           >
-            {/* folder tab button */}
+            {/* Tab header button */}
             <button
-              onClick={() => setActive(isActive ? -1 : i)}
+              onClick={() => setActive(isOpen ? -1 : i)}
               style={{
                 width: '100%',
                 border: 'none',
                 background: 'transparent',
                 cursor: 'pointer',
-                padding: '13px 18px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                fontFamily: 'var(--font-label)',
-                fontWeight: 800,
-                fontStyle: 'italic',
-                fontSize: 23,
-                letterSpacing: '-0.01em',
-                color: labelColor,
-                textAlign: 'left',
+                padding: isFirst ? '24px 24px 18px' : '30px 24px 18px',
                 WebkitTapHighlightColor: 'transparent',
               }}
             >
-              <span>{f.label}</span>
-
-              {f.badge != null && f.badge > 0 && (
-                <span
-                  style={{
-                    fontFamily: 'var(--font-ui)',
-                    fontStyle: 'normal',
-                    fontWeight: 800,
-                    fontSize: 11,
-                    minWidth: 20,
-                    height: 20,
-                    padding: '0 6px',
-                    borderRadius: 999,
-                    background: isActive ? '#141414' : 'rgba(0,0,0,0.2)',
-                    color: '#fff',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  {f.badge}
-                </span>
-              )}
+              <span
+                style={{
+                  fontFamily: 'var(--font-label)',
+                  fontWeight: 800,
+                  fontStyle: 'italic',
+                  fontSize: 26,
+                  color: '#26241f',
+                  textAlign: 'left',
+                }}
+              >
+                {f.label}
+              </span>
+              <Caret open={isOpen} />
             </button>
 
-            {/* collapsible content */}
-            <div
-              style={{
-                maxHeight: isActive ? 1600 : 0,
-                overflow: 'hidden',
-                transition: 'max-height 0.42s cubic-bezier(0.22,0.61,0.36,1)',
-              }}
-            >
-              <div style={{ padding: '0 18px 18px' }}>{f.content}</div>
-            </div>
+            {/* Collapsible content */}
+            {isOpen && (
+              <div style={{ padding: '0 18px 30px' }}>
+                {f.content}
+              </div>
+            )}
           </div>
         )
       })}

@@ -1,15 +1,3 @@
-export type Banner = 'HD' | 'RONA' | 'RONA+'
-
-export interface Store {
-  id: string
-  banner: Banner
-  name: string
-  prov: string
-  ytd: number
-  lastYear: number
-  lastVisit: string
-}
-
 export type PhotoType = 'bay_before' | 'display_before' | 'competitor' | 'final'
 
 export interface ChecklistAnswers {
@@ -19,6 +7,16 @@ export interface ChecklistAnswers {
 }
 
 export type VisitStatus = 'in_progress' | 'pending_sync' | 'syncing' | 'synced' | 'error'
+
+export type AssessmentState = Record<string, string | boolean | number | undefined>
+
+export interface Store {
+  id: string
+  name: string   // includes banner e.g. "RONA+ Carrefour Laval"
+  prov: string
+  tw: number     // sales this week
+  ly: number     // last year same week
+}
 
 export interface LocalVisit {
   localId: string
@@ -32,8 +30,17 @@ export interface LocalVisit {
   missingProducts: string[]
   comments: string
   signature: string | null    // PNG dataURL
+  assessmentState: AssessmentState
   errorMessage?: string
   supabaseId?: string         // set after successful sync
+}
+
+export interface Folder {
+  key: string
+  label: string
+  tint: string
+  badge?: number | null
+  content: React.ReactNode
 }
 
 // Supabase row shapes (snake_case mirrors DB)
@@ -64,20 +71,6 @@ export interface SupabasePhoto {
   photo_type: PhotoType
   photo_url: string
   uploaded_at: string
-}
-
-export interface Folder {
-  key: string
-  label: string
-  badge?: number | null
-  content: React.ReactNode
-}
-
-export interface VisitSummary {
-  photoCount: number
-  answeredCount: number
-  missingCount: number
-  hasSignature: boolean
 }
 
 export interface SyncResult {
