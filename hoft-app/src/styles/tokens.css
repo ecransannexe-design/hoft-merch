@@ -4,9 +4,9 @@
 
 :root {
   /* --- type families --- */
-  --font-ui:    'Larsseit', 'Helvetica Neue', Arial, sans-serif;
-  --font-label: 'Queens Compressed', 'Larsseit', 'Helvetica Neue', Arial, serif;
-  --font-num:   'Larsseit', 'Helvetica Neue', Arial, sans-serif;
+  --font-ui:    'Archivo', 'Larsseit', 'Helvetica Neue', Arial, sans-serif;
+  --font-label: 'Archivo', 'Queens Compressed', 'Larsseit', 'Helvetica Neue', Arial, sans-serif;
+  --font-num:   'Archivo', 'Larsseit', 'Helvetica Neue', Arial, sans-serif;
 
   /* --- neutrals --- */
   --ink:      #141414;
