@@ -1,6 +1,6 @@
 [build]
-  base    = "hoft-app"
-  command = "npm run build"
+  base    = "."
+  command = "cd hoft-app && npm ci && npm run build"
   publish = "hoft-app/dist"
 
 [build.environment]
