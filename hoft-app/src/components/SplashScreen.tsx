@@ -120,9 +120,9 @@ export function SplashScreen({ rep, store, onPickRep, onPickStore, onEnter, safe
       {/* Logo */}
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <img
-          src="/assets/hoft-logo.png"
+          src="/assets/hoft-merchandising.png"
           alt="HOFT merchandising"
-          style={{ width: 210, opacity: 0.92, filter: 'brightness(0) invert(1)' }}
+          style={{ width: 210, opacity: 0.92 }}
         />
       </div>
 
