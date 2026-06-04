@@ -278,6 +278,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                      txt.includes('SUBMIT') || txt.includes('TERMINER') ||
                      txt.includes('SOUMETTRE') || txt.includes('ENVOYER') ||
                      txt.includes('SAVE') || txt.includes('DONE');
+      console.log('[HOFT] Button clicked:', txt, '| isSubmit:', isSubmit);
       if (!isSubmit) return;
 
       var state = getFiberState();
@@ -315,6 +316,18 @@ document.addEventListener('DOMContentLoaded', async function() {
       });
     });
   }
+
+  // Debug: show a small badge when Supabase is ready
+  setTimeout(function() {
+    var badge = document.createElement('div');
+    badge.id = '__sb_badge';
+    badge.style.cssText = 'position:fixed;top:8px;right:8px;background:#2FA84F;color:#fff;' +
+      'font:700 10px/1 monospace;padding:3px 7px;border-radius:4px;z-index:99999;opacity:0.7;pointer-events:none;';
+    badge.textContent = 'SB';
+    document.body.appendChild(badge);
+    // Remove after 4 seconds
+    setTimeout(function(){ badge.remove(); }, 4000);
+  }, 2000);
 
   setTimeout(initSupabase, 1500);
 
