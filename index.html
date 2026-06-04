@@ -201,9 +201,22 @@ document.addEventListener('DOMContentLoaded', async function() {
   }
 
   function getFiberState() {
-    var stage = document.getElementById('stage');
+    // Try multiple possible root element IDs used by different React setups
+    var stage = document.getElementById('stage') ||
+                document.getElementById('root') ||
+                document.getElementById('app') ||
+                document.getElementById('__next') ||
+                document.querySelector('[id]');
     if (!stage) return null;
     var fiberKey = Object.keys(stage).find(function(k){ return k.startsWith('__reactFiber'); });
+    // If not on root element, search all elements for a React fiber
+    if (!fiberKey) {
+      var all = document.querySelectorAll('*');
+      for (var i = 0; i < all.length; i++) {
+        var k = Object.keys(all[i]).find(function(k){ return k.startsWith('__reactFiber'); });
+        if (k) { stage = all[i]; fiberKey = k; break; }
+      }
+    }
     if (!fiberKey) return null;
 
     function traverse(fiber, depth) {
@@ -258,7 +271,14 @@ document.addEventListener('DOMContentLoaded', async function() {
   function setupIntercept() {
     document.addEventListener('click', function(e) {
       var btn = e.target.closest('button');
-      if (!btn || !btn.textContent.trim().toUpperCase().includes('COMPLETE VISIT')) return;
+      if (!btn) return;
+      var txt = btn.textContent.trim().toUpperCase();
+      // Match any "complete" or "finish" style button
+      var isSubmit = txt.includes('COMPLETE') || txt.includes('FINISH') ||
+                     txt.includes('SUBMIT') || txt.includes('TERMINER') ||
+                     txt.includes('SOUMETTRE') || txt.includes('ENVOYER') ||
+                     txt.includes('SAVE') || txt.includes('DONE');
+      if (!isSubmit) return;
 
       var state = getFiberState();
       if (!state || !state.rep || !state.store) {
