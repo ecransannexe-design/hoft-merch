@@ -201,50 +201,57 @@ document.addEventListener('DOMContentLoaded', async function() {
   }
 
   function getFiberState() {
-    // Try multiple possible root element IDs used by different React setups
-    var stage = document.getElementById('stage') ||
-                document.getElementById('root') ||
-                document.getElementById('app') ||
-                document.getElementById('__next') ||
-                document.querySelector('[id]');
-    if (!stage) { console.log('[HOFT] No stage element found'); return null; }
-    var fiberKey = Object.keys(stage).find(function(k){ return k.startsWith('__reactFiber'); });
-    // If not on root element, search all elements for a React fiber
-    if (!fiberKey) {
-      var all = document.querySelectorAll('*');
-      for (var i = 0; i < all.length; i++) {
-        var k = Object.keys(all[i]).find(function(k){ return k.startsWith('__reactFiber'); });
-        if (k) { stage = all[i]; fiberKey = k; break; }
-      }
+    // Find any element with a React fiber key
+    var all = document.querySelectorAll('*');
+    var fiberEl = null, fiberKey = null;
+    for (var i = 0; i < all.length; i++) {
+      var k = Object.keys(all[i]).find(function(kk){ return kk.startsWith('__reactFiber'); });
+      if (k) { fiberEl = all[i]; fiberKey = k; break; }
     }
-    if (!fiberKey) { console.log('[HOFT] No React fiber key found'); return null; }
-    console.log('[HOFT] Found fiber on element:', stage.tagName, stage.id || stage.className);
+    if (!fiberEl) { console.log('[HOFT] No React fiber found'); return null; }
+
+    // Walk UP to the fiber tree root so we can traverse the whole app
+    var fiber = fiberEl[fiberKey];
+    var safety = 0;
+    while (fiber.return && safety++ < 300) fiber = fiber.return;
+    console.log('[HOFT] Walked up', safety, 'levels to root fiber');
 
     var componentNames = [];
-    function traverse(fiber, depth) {
-      if (!fiber || depth > 80) return null;
-      var name = (fiber.type && (fiber.type.name || fiber.type.displayName)) || '';
-      if (name && depth < 15) componentNames.push(name);
-      if (name === 'AssessmentApp' && fiber.memoizedState) {
-        var states = [], s = fiber.memoizedState;
+    function traverse(f, depth) {
+      if (!f || depth > 300) return null;
+      var name = (f.type && (f.type.name || f.type.displayName)) || '';
+      if (name && depth < 20) componentNames.push(name);
+
+      // Look for a component whose state has: string, string, object (screen, rep, store)
+      if (f.memoizedState) {
+        var states = [], s = f.memoizedState;
         while (s) { states.push(s.memoizedState); s = s.next; }
-        if (states.length >= 6 && (states[0] === 'splash' || states[0] === 'store')) {
-          return { screen: states[0], rep: states[1], store: states[2], answers: states[5] || {} };
+        // Find rep (non-empty string) and store (object with name/id) anywhere in states
+        var repVal = null, storeVal = null, answersVal = {};
+        for (var i = 0; i < states.length; i++) {
+          if (!repVal && typeof states[i] === 'string' && states[i].length > 1 && states[i].length < 40 &&
+              states[i] !== 'splash' && states[i] !== 'store' && states[i] !== 'assessment') {
+            repVal = states[i];
+          }
+          if (!storeVal && states[i] && typeof states[i] === 'object' && !Array.isArray(states[i]) &&
+              (states[i].name || states[i].id)) {
+            storeVal = states[i];
+          }
+          if (states[i] && typeof states[i] === 'object' && !Array.isArray(states[i]) &&
+              Object.keys(states[i]).length > 2 && states[i] !== storeVal) {
+            answersVal = states[i];
+          }
+        }
+        if (repVal && storeVal) {
+          console.log('[HOFT] Found app state in:', name || '(anonymous)', 'rep:', repVal, 'store:', storeVal.name);
+          return { rep: repVal, store: storeVal, answers: answersVal };
         }
       }
-      // fallback: detect by state shape
-      if (!name.includes('App') && fiber.memoizedState) {
-        var ss = [], sx = fiber.memoizedState;
-        while (sx) { ss.push(sx.memoizedState); sx = sx.next; }
-        if (ss.length >= 6 && (ss[0] === 'splash' || ss[0] === 'store') &&
-            ss[1] && typeof ss[1] === 'string' && ss[2] && typeof ss[2] === 'object') {
-          return { screen: ss[0], rep: ss[1], store: ss[2], answers: ss[5] || {} };
-        }
-      }
-      return traverse(fiber.child, depth + 1) || (depth < 3 ? traverse(fiber.sibling, depth) : null);
+      return traverse(f.child, depth + 1) || traverse(f.sibling, depth + 1);
     }
-    var result = traverse(stage[fiberKey], 0);
-    console.log('[HOFT] Components found:', componentNames.join(', '));
+
+    var result = traverse(fiber, 0);
+    console.log('[HOFT] Components scanned:', componentNames.slice(0, 20).join(', '));
     return result;
   }
 
