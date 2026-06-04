@@ -207,7 +207,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 document.getElementById('app') ||
                 document.getElementById('__next') ||
                 document.querySelector('[id]');
-    if (!stage) return null;
+    if (!stage) { console.log('[HOFT] No stage element found'); return null; }
     var fiberKey = Object.keys(stage).find(function(k){ return k.startsWith('__reactFiber'); });
     // If not on root element, search all elements for a React fiber
     if (!fiberKey) {
@@ -217,11 +217,14 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (k) { stage = all[i]; fiberKey = k; break; }
       }
     }
-    if (!fiberKey) return null;
+    if (!fiberKey) { console.log('[HOFT] No React fiber key found'); return null; }
+    console.log('[HOFT] Found fiber on element:', stage.tagName, stage.id || stage.className);
 
+    var componentNames = [];
     function traverse(fiber, depth) {
       if (!fiber || depth > 80) return null;
       var name = (fiber.type && (fiber.type.name || fiber.type.displayName)) || '';
+      if (name && depth < 15) componentNames.push(name);
       if (name === 'AssessmentApp' && fiber.memoizedState) {
         var states = [], s = fiber.memoizedState;
         while (s) { states.push(s.memoizedState); s = s.next; }
@@ -240,7 +243,9 @@ document.addEventListener('DOMContentLoaded', async function() {
       }
       return traverse(fiber.child, depth + 1) || (depth < 3 ? traverse(fiber.sibling, depth) : null);
     }
-    return traverse(stage[fiberKey], 0);
+    var result = traverse(stage[fiberKey], 0);
+    console.log('[HOFT] Components found:', componentNames.join(', '));
+    return result;
   }
 
   function compressImage(dataUrl, cb) {
@@ -282,8 +287,10 @@ document.addEventListener('DOMContentLoaded', async function() {
       if (!isSubmit) return;
 
       var state = getFiberState();
+      console.log('[HOFT] getFiberState result:', JSON.stringify(state));
       if (!state || !state.rep || !state.store) {
         toast('⚠ Impossible de lire les données', '#F5A623');
+        console.log('[HOFT] State missing - rep:', state && state.rep, 'store:', state && state.store);
         return;
       }
 
