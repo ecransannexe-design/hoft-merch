@@ -1,10 +1,6 @@
 [build]
-  base    = "."
-  command = "cd hoft-app && npm ci && npm run build"
-  publish = "hoft-app/dist"
-
-[build.environment]
-  NODE_VERSION = "20"
+  command = ""
+  publish = "."
 
 [[redirects]]
   from   = "/*"
